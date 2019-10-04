@@ -118,7 +118,8 @@ function () {
               items: videos,
               store: store,
               cache: cache,
-              createNode: createNode
+              createNode: createNode,
+              createNodeId: createNodeId
             });
 
           case 27:

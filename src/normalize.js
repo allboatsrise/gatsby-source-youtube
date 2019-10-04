@@ -50,7 +50,7 @@ exports.normalizeRecords = items => {
   });
 };
 
-exports.downloadThumbnails = async ({ items, store, cache, createNode }) =>
+exports.downloadThumbnails = async ({ items, store, cache, createNode, createNodeId }) =>
   Promise.all(
     items.map(async item => {
       let fileNode;
@@ -58,9 +58,11 @@ exports.downloadThumbnails = async ({ items, store, cache, createNode }) =>
         try {
           fileNode = await createRemoteFileNode({
             url: item.thumbnail.url,
+            parentNodeId: item.id,
             store,
             cache,
-            createNode
+            createNode,
+            createNodeId,
           });
         } catch (error) {
           // noop

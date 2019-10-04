@@ -74,7 +74,8 @@ const createVideoNodesFromChannelId = async ({
     items: videos,
     store,
     cache,
-    createNode
+    createNode,
+    createNodeId,
   });
   normalize.createNodesFromEntities(videos, createNode);
 

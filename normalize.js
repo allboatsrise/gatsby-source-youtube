@@ -54,12 +54,12 @@ function () {
   var _ref2 = _asyncToGenerator(
   /*#__PURE__*/
   regeneratorRuntime.mark(function _callee2(_ref) {
-    var items, store, cache, createNode;
+    var items, store, cache, createNode, createNodeId;
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            items = _ref.items, store = _ref.store, cache = _ref.cache, createNode = _ref.createNode;
+            items = _ref.items, store = _ref.store, cache = _ref.cache, createNode = _ref.createNode, createNodeId = _ref.createNodeId;
             return _context2.abrupt("return", Promise.all(items.map(
             /*#__PURE__*/
             function () {
@@ -80,9 +80,11 @@ function () {
                         _context.next = 4;
                         return createRemoteFileNode({
                           url: item.thumbnail.url,
+                          parentNodeId: item.id,
                           store: store,
                           cache: cache,
-                          createNode: createNode
+                          createNode: createNode,
+                          createNodeId: createNodeId
                         });
 
                       case 4:
