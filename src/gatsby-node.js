@@ -1,7 +1,6 @@
 const axios = require("axios");
 const get = require("lodash/get");
 const normalize = require("./normalize");
-const polyfill = require("babel-polyfill");
 
 function getApi() {
   const rateLimit = 500;

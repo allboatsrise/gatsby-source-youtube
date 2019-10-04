@@ -5,8 +5,9 @@
     "repository": "https://github.com/iyeraravind/gatsby-source-youtube",
     "main": "index.js",
     "scripts": {
-        "build": "babel src --out-dir . --ignore __tests__",
-        "prepublish": "cross-env NODE_ENV=production npm run build"
+        "build": "babel src --out-dir .",
+        "watch": "babel --watch src --out-dir .",
+        "dist": "cross-env NODE_ENV=production npm run build"
     },
     "keywords": [
         "gatsby",
@@ -17,16 +18,14 @@
     "author": "Aravind Iyer <aravindiyer@gmail.com>",
     "license": "MIT",
     "dependencies": {
-        "axios": "^0.18.0",
-        "babel-polyfill": "^6.26.0",
-        "gatsby-source-filesystem": "^1.5.27",
-        "lodash": "^4.17.5"
+        "axios": "^0.19.0",
+        "gatsby-source-filesystem": "^2.1",
+        "lodash": "^4.17"
     },
     "devDependencies": {
-        "babel-cli": "^6.26.0",
-        "babel-plugin-transform-es2015-destructuring": "^6.23.0",
-        "babel-plugin-transform-object-rest-spread": "^6.26.0",
-        "babel-preset-env": "^1.6.1",
-        "cross-env": "^5.1.4"
+        "@babel/cli": "^7.6.2",
+        "@babel/core": "^7.6.2",
+        "@babel/preset-env": "^7.6.2",
+        "cross-env": "^6.0.3"
     }
 }
