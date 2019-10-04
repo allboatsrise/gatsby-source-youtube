@@ -8,20 +8,26 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+exports.createSchemaCustomization = function (_ref) {
+  var createTypes = _ref.actions.createTypes;
+  var typeDefs = "\n    type YoutubeVideo implements Node @dontInfer {\n      publishedAt: Date! @dateformat\n      title: String!\n      description: String!\n      videoId: String!\n      privacyStatus: String!\n      channelId: String!\n      channelTitle: String!\n      thumbnail: YoutubeVideoThumbnail!\n      originalID: String!\n    }\n\n    type YoutubeVideoThumbnail @dontInfer {\n      url: String!\n      width: Int!\n      height: Int!\n    }\n  ";
+  createTypes(typeDefs);
+};
+
 exports.sourceNodes =
 /*#__PURE__*/
 function () {
-  var _ref3 = _asyncToGenerator(
+  var _ref4 = _asyncToGenerator(
   /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee2(_ref, _ref2) {
-    var boundActionCreators, store, cache, createNodeId, channelId, apiKey, _ref2$maxVideos, maxVideos, createNode;
+  regeneratorRuntime.mark(function _callee2(_ref2, _ref3) {
+    var boundActionCreators, store, cache, createNodeId, channelId, apiKey, _ref3$maxVideos, maxVideos, createNode;
 
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            boundActionCreators = _ref.boundActionCreators, store = _ref.store, cache = _ref.cache, createNodeId = _ref.createNodeId;
-            channelId = _ref2.channelId, apiKey = _ref2.apiKey, _ref2$maxVideos = _ref2.maxVideos, maxVideos = _ref2$maxVideos === void 0 ? 50 : _ref2$maxVideos;
+            boundActionCreators = _ref2.boundActionCreators, store = _ref2.store, cache = _ref2.cache, createNodeId = _ref2.createNodeId;
+            channelId = _ref3.channelId, apiKey = _ref3.apiKey, _ref3$maxVideos = _ref3.maxVideos, maxVideos = _ref3$maxVideos === void 0 ? 50 : _ref3$maxVideos;
             createNode = boundActionCreators.createNode;
 
             if (channelId) {
@@ -38,7 +44,7 @@ function () {
             return Promise.all(channelId.map(
             /*#__PURE__*/
             function () {
-              var _ref4 = _asyncToGenerator(
+              var _ref5 = _asyncToGenerator(
               /*#__PURE__*/
               regeneratorRuntime.mark(function _callee(channelIdEntry) {
                 return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -64,7 +70,7 @@ function () {
               }));
 
               return function (_x3) {
-                return _ref4.apply(this, arguments);
+                return _ref5.apply(this, arguments);
               };
             }()));
 
@@ -86,6 +92,6 @@ function () {
   }));
 
   return function (_x, _x2) {
-    return _ref3.apply(this, arguments);
+    return _ref4.apply(this, arguments);
   };
 }();
