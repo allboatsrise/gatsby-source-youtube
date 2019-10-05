@@ -37,7 +37,7 @@ const videoToVideoNode = ({video, channelNodeId, createNodeId}) => {
   const thumbnails = video.snippet.thumbnails
 
   const fieldData = {
-    videoId: video.id,
+    videoId: video.contentDetails.videoId,
     channelId: video.snippet.channelId,
     title: video.snippet.title,
     description: video.snippet.description,
