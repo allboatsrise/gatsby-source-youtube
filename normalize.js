@@ -48,7 +48,7 @@ var videoToVideoNode = function videoToVideoNode(_ref3) {
       createNodeId = _ref3.createNodeId;
   var thumbnails = video.snippet.thumbnails;
   var fieldData = {
-    videoId: video.id,
+    videoId: video.contentDetails.videoId,
     channelId: video.snippet.channelId,
     title: video.snippet.title,
     description: video.snippet.description,
