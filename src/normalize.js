@@ -1,95 +1,71 @@
-const get = require("lodash/get");
-const { createRemoteFileNode } = require("gatsby-source-filesystem");
 const crypto = require("crypto");
 
-const digest = str =>
+const digest = obj =>
   crypto
     .createHash(`md5`)
-    .update(str)
+    .update(JSON.stringify(obj))
     .digest(`hex`);
 
-exports.createGatsbyIds = (items, createNodeId) => {
-  return items.map(e => {
-    e.originalID = e.id;
-    e.id = createNodeId(e.id.toString());
-    return e;
-  });
-};
+exports.channelToChannelNode = ({channel, createNodeId}) => {
+  const fieldData = {
+    channelId: channel.id,
+    title: channel.snippet.title,
+    description: channel.snippet.description,
+    customUrl: channel.snippet.customUrl,
+    publishedAt: channel.snippet.publishedAt,
+  }
 
-exports.normalizeRecords = items => {
-  return (items || []).map(item => {
-    const e = {
-      id: get(item, "id"),
-      publishedAt: get(item, "snippet.publishedAt"),
-      title: get(item, "snippet.title"),
-      description: get(item, "snippet.description"),
-      videoId: get(item, "contentDetails.videoId"),
-      privacyStatus: get(item, "status.privacyStatus"),
-      channelId: get(item, "snippet.channelId"),
-      channelTitle: get(item, "snippet.channelTitle"),
-      thumbnail: get(
-        item,
-        "snippet.thumbnails.maxres",
-        get(
-          item,
-          "snippet.thumbnails.standard",
-          get(
-            item,
-            "snippet.thumbnails.high",
-            get(
-              item,
-              "snippet.thumbnails.medium",
-              get(item, "snippet.thumbnails.default")
-            )
-          )
-        )
-      )
-    };
+  const node = Object.assign(fieldData, {
+    id: createNodeId(channel.id),
+    parent: null,
+    children: [],
+    internal: {
+      type: 'YoutubeChannel',
+      contentDigest: digest(fieldData),
+      content: JSON.stringify(channel),
+    },
+  })
 
-    return e;
-  });
-};
+  return node
+}
 
-exports.downloadThumbnails = async ({ items, store, cache, createNode, createNodeId }) =>
-  Promise.all(
-    items.map(async item => {
-      let fileNode;
-      if (item.thumbnail && item.thumbnail.url) {
-        try {
-          fileNode = await createRemoteFileNode({
-            url: item.thumbnail.url,
-            parentNodeId: item.id,
-            store,
-            cache,
-            createNode,
-            createNodeId,
-          });
-        } catch (error) {
-          // noop
-        }
+exports.videosToVideoNodes = ({videos, channelNodeId, createNodeId}) => {
+  return videos.map((video) => videoToVideoNode({video, channelNodeId, createNodeId}))
+}
+
+const videoToVideoNode = ({video, channelNodeId, createNodeId}) => {
+  const thumbnails = video.snippet.thumbnails
+
+  const fieldData = {
+    videoId: video.id,
+    channelId: video.snippet.channelId,
+    title: video.snippet.title,
+    description: video.snippet.description,
+    publishedAt: video.snippet.publishedAt,
+    privacyStatus: video.status.privacyStatus,
+    thumbnails: Object.keys(thumbnails).map(size => {
+      const thumbnail = thumbnails[size]
+      return {
+        size,
+        url: thumbnail.url,
+        width: thumbnail.width,
+        height: thumbnail.height,
       }
-
-      if (fileNode) {
-        item.localThumbnail___NODE = fileNode.id;
-      }
-
-      return item;
     })
-  );
+  }
 
-exports.createNodesFromEntities = (items, createNode) => {
-  items.forEach(e => {
-    let { ...entity } = e;
-    let node = {
-      ...entity,
-      parent: null,
-      children: [],
-      internal: {
-        type: "YoutubeVideo",
-        contentDigest: digest(JSON.stringify(entity))
-      }
-    };
+  const node = Object.assign(fieldData, {
+    id: createNodeId(video.id),
+    parent: channelNodeId,
+    children: [],
+    internal: {
+      type: 'YoutubeVideo',
+      contentDigest: digest(fieldData),
+      content: JSON.stringify(video),
+    },
+  })
+  
+  return node
+}
 
-    createNode(node);
-  });
-};
+exports.videoToVideoNode = videoToVideoNode

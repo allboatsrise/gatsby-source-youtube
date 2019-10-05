@@ -2,19 +2,28 @@ import createVideoNodesFromChannelId from './create-video-nodes-from-channel-id'
 
 exports.createSchemaCustomization = ({ actions: {createTypes} }) => {
   const typeDefs = `
-    type YoutubeVideo implements Node @dontInfer {
-      publishedAt: Date! @dateformat
+    type YoutubeChannel implements Node @dontInfer {
+      channelId: String!
       title: String!
       description: String!
+      customUrl: String!
+      publishedAt: Date! @dateformat
+      videos: [YoutubeVideo!]! @link(by: "channelId", from: "channelId")
+    }
+    
+    type YoutubeVideo implements Node @dontInfer {
       videoId: String!
-      privacyStatus: String!
       channelId: String!
-      channelTitle: String!
-      thumbnail: YoutubeVideoThumbnail!
-      originalID: String!
+      title: String!
+      description: String!
+      publishedAt: Date! @dateformat
+      privacyStatus: String!
+      channel: YoutubeChannel! @link(by: "channelId", from: "channelId")
+      thumbnails: [YoutubeVideoThumbnail!]!
     }
 
     type YoutubeVideoThumbnail @dontInfer {
+      size: String!
       url: String!
       width: Int!
       height: Int!

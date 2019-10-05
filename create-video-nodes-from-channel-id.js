@@ -19,8 +19,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 var axios = require("axios");
 
-var get = require("lodash/get");
-
 var normalize = require("./normalize");
 
 function getApi() {
@@ -60,36 +58,34 @@ function () {
   var _ref2 = _asyncToGenerator(
   /*#__PURE__*/
   regeneratorRuntime.mark(function _callee(_ref) {
-    var channelId, apiKey, maxVideos, createNode, store, cache, createNodeId, api, videos, channelResp, channelData, _videos, uploadsId, pageSize, videoResp, _videos2, nextPageToken;
-
+    var channelId, apiKey, maxVideos, createNode, createNodeId, api, videos, channelResp, channel, uploadsId, pageSize, videoResp, nextPageToken, channelNode, videoNodes;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            channelId = _ref.channelId, apiKey = _ref.apiKey, maxVideos = _ref.maxVideos, createNode = _ref.createNode, store = _ref.store, cache = _ref.cache, createNodeId = _ref.createNodeId;
+            channelId = _ref.channelId, apiKey = _ref.apiKey, maxVideos = _ref.maxVideos, createNode = _ref.createNode, createNodeId = _ref.createNodeId;
             api = getApi();
             videos = [];
             _context.next = 5;
-            return api.get("channels?part=contentDetails&id=".concat(channelId, "&key=").concat(apiKey));
+            return api.get("channels?part=snippet,contentDetails&id=".concat(channelId, "&key=").concat(apiKey));
 
           case 5:
             channelResp = _context.sent;
-            channelData = channelResp.data.items[0];
+            channel = channelResp.data.items[0];
 
-            if (!channelData) {
-              _context.next = 23;
+            if (!channel) {
+              _context.next = 25;
               break;
             }
 
-            uploadsId = get(channelData, "contentDetails.relatedPlaylists.uploads");
+            uploadsId = channel.contentDetails.relatedPlaylists.uploads;
             pageSize = Math.min(50, maxVideos);
             _context.next = 12;
             return api.get("playlistItems?part=snippet%2CcontentDetails%2Cstatus&maxResults=".concat(pageSize, "&playlistId=").concat(uploadsId, "&key=").concat(apiKey));
 
           case 12:
             videoResp = _context.sent;
-
-            (_videos = videos).push.apply(_videos, _toConsumableArray(videoResp.data.items));
+            videos.push.apply(videos, _toConsumableArray(videoResp.data.items));
 
           case 14:
             if (!(videoResp.data.nextPageToken && videos.length < maxVideos)) {
@@ -104,30 +100,36 @@ function () {
 
           case 19:
             videoResp = _context.sent;
-
-            (_videos2 = videos).push.apply(_videos2, _toConsumableArray(videoResp.data.items));
-
+            videos.push.apply(videos, _toConsumableArray(videoResp.data.items));
             _context.next = 14;
             break;
 
           case 23:
-            videos = normalize.normalizeRecords(videos);
-            videos = normalize.createGatsbyIds(videos, createNodeId);
             _context.next = 27;
-            return normalize.downloadThumbnails({
-              items: videos,
-              store: store,
-              cache: cache,
-              createNode: createNode,
-              createNodeId: createNodeId
-            });
+            break;
 
-          case 27:
-            videos = _context.sent;
-            normalize.createNodesFromEntities(videos, createNode);
+          case 25:
+            console.warn("Failed to fetch channel data. (channelId: ".concat(channelId, ")"));
             return _context.abrupt("return");
 
-          case 30:
+          case 27:
+            // channel
+            channelNode = normalize.channelToChannelNode({
+              channel: channel,
+              createNodeId: createNodeId
+            });
+            createNode(channelNode); // videos
+
+            videoNodes = normalize.videosToVideoNodes({
+              videos: videos,
+              channelNodeId: channelNode.id,
+              createNodeId: createNodeId
+            });
+            videoNodes.forEach(function (node) {
+              return createNode(node);
+            });
+
+          case 31:
           case "end":
             return _context.stop();
         }

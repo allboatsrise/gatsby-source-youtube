@@ -1,5 +1,4 @@
 const axios = require("axios");
-const get = require("lodash/get");
 const normalize = require("./normalize");
 
 function getApi() {
@@ -34,23 +33,18 @@ const createVideoNodesFromChannelId = async ({
   apiKey,
   maxVideos,
   createNode,
-  store,
-  cache,
   createNodeId
 }) => {
   var api = getApi();
   let videos = [];
 
   const channelResp = await api.get(
-    `channels?part=contentDetails&id=${channelId}&key=${apiKey}`
+    `channels?part=snippet,contentDetails&id=${channelId}&key=${apiKey}`
   );
 
-  const channelData = channelResp.data.items[0];
-  if (!!channelData) {
-    const uploadsId = get(
-      channelData,
-      "contentDetails.relatedPlaylists.uploads"
-    );
+  const channel = channelResp.data.items[0];
+  if (!!channel) {
+    const uploadsId = channel.contentDetails.relatedPlaylists.uploads
     let pageSize = Math.min(50, maxVideos);
 
     let videoResp = await api.get(
@@ -66,20 +60,18 @@ const createVideoNodesFromChannelId = async ({
       );
       videos.push(...videoResp.data.items);
     }
+  } else {
+    console.warn(`Failed to fetch channel data. (channelId: ${channelId})`)
+    return
   }
 
-  videos = normalize.normalizeRecords(videos);
-  videos = normalize.createGatsbyIds(videos, createNodeId);
-  videos = await normalize.downloadThumbnails({
-    items: videos,
-    store,
-    cache,
-    createNode,
-    createNodeId,
-  });
-  normalize.createNodesFromEntities(videos, createNode);
+  // channel
+  const channelNode = normalize.channelToChannelNode({channel, createNodeId})
+  createNode(channelNode)
 
-  return;
+  // videos
+  const videoNodes = normalize.videosToVideoNodes({videos, channelNodeId: channelNode.id, createNodeId})
+  videoNodes.forEach((node) => createNode(node))
 }
 
 export default createVideoNodesFromChannelId
