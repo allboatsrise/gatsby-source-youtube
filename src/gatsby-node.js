@@ -6,7 +6,7 @@ exports.createSchemaCustomization = ({ actions: {createTypes} }) => {
       channelId: String!
       title: String!
       description: String!
-      customUrl: String!
+      customUrl: String
       publishedAt: Date! @dateformat
       videos: [YoutubeVideo!]! @link(by: "channelId", from: "channelId")
     }
